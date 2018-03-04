@@ -1,7 +1,5 @@
 <template>
-  <div class="app">
-
-  </div>
+  <div class="vis-date-picker"></div>
 </template>
 
 <script>

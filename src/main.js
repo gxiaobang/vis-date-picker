@@ -1,8 +1,10 @@
 import Vue from 'vue';
-import App from './App';
+import 'normalize.css';
+import App from './app';
 
-return new Vue({
+
+export default new Vue({
   el: '#app',
-  template: '<App />',
+  template: '<app />',
   components: { App }
 });
