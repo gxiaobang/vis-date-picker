@@ -1,10 +1,9 @@
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const OpenBrowserPlugin = require('open-browser-webpack-plugin');
+const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
 const path = require('path');
 const { SRCPATH, PUBLICPATH } = require('../config/path.conf.js');
-
-console.log(SRCPATH)
 
 const port = 8080;
 
@@ -60,6 +59,8 @@ module.exports = {
   plugins: [
     // 热更新
     new webpack.HotModuleReplacementPlugin(),
+    // 命令行友好提示
+    new FriendlyErrorsPlugin(),
 
     // 修改页面静态文件路径
     new HtmlWebpackPlugin({
