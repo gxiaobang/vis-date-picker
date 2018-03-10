@@ -2,22 +2,31 @@
   <div class="lemon-date-picker">
     <input type="text" v-model="dateStr" @focus="show">
     <div class="calendar" v-if="visable">
-      <table>
-        <thead>
-          <tr>
-            <th v-for="(name, index) in dayNames" :key="index">
-              {{ name }}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, index) in details" :key="index">
-            <td v-for="(item2, n2) in item" :key="n2" @click="selectDate(item2.moment)">
-              {{ item2.date }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="calendar-header">
+        <a href="javascript:;" @click="prevMonth">上个月</a>
+        <span class="calendar-info">
+          {{ currentDate.format('YYYY-MM-DD') }}
+        </span>
+        <a href="javascript:;" @click="nextMonth">下个月</a>
+      </div>
+      <div class="calendar-body">
+        <table>
+          <thead>
+            <tr>
+              <th v-for="(name, index) in dayNames" :key="index">
+                {{ name }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in details" :key="index">
+              <td v-for="(date, n2) in item" :key="n2" @click="selectDate(date)" :class="currentDate.month() == date.month() ? 'current' : 'not-current'">
+                {{ date.date() }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
@@ -31,21 +40,27 @@ export default {
       dateStr: '',
       visable: false,
       dayNames: ['日', '一', '二', '三', '四', '五', '六'],
-      details: []
+      details: [],
+      currentDate: null,
+      selectedDate: null // 选择的日期
     }
+  },
+  computed: {
   },
   methods: {
     show() {
       this.visable = true;
-      this.details = this.getDetails();
+
+      this.currentDate = this.selectedDate ? moment(this.selectedDate) : moment();
+      this.details = this.getDetails(this.currentDate);
     },
     hide() {
       this.visable = false;
     },
 
     // 获取详情
-    getDetails() {
-      const date = moment();
+    getDetails(date) {
+      date = moment(date);
       date.date(1);
 
       // console.log(date.date());
@@ -62,10 +77,7 @@ export default {
 
         // 横向
         for (let j = 0; j < 7; j++) {
-          item.push({
-            date: date.date(),
-            moment: moment(date)
-          });
+          item.push(moment(date));
           date.add(1, 'day');
         }
       }
@@ -75,8 +87,21 @@ export default {
 
     // 选择日期
     selectDate(date) {
+      this.selectedDate = date.format('YYYY-MM-DD');
       this.dateStr = date.format('YYYY-MM-DD');
       this.hide();
+    },
+
+    // 上个月
+    prevMonth() {
+      this.currentDate.add(-1, 'month');
+      this.details = this.getDetails(this.currentDate);
+    },
+
+    // 下个月
+    nextMonth() {
+      this.currentDate.add(1, 'month');
+      this.details = this.getDetails(this.currentDate);
     }
   }
 }
