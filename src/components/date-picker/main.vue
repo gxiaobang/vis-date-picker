@@ -1,7 +1,7 @@
 <template>
   <div class="lemon-date-picker">
-    <input type="text" v-model="dateStr" @focus="show">
-    <div class="calendar" v-if="visable">
+    <input type="text" v-model="dateStr" readonly @focus="popup">
+    <div class="calendar" v-if="visiable">
       <div class="calendar-header">
         <a href="javascript:;" @click="prevMonth">上个月</a>
         <span class="calendar-info">
@@ -34,11 +34,13 @@
 <script>
 import moment from 'moment';
 import './main.scss';
+import { addEvent } from '@/utils';
+
 export default {
   data() {
     return {
       dateStr: '',
-      visable: false,
+      visiable: false,
       dayNames: ['日', '一', '二', '三', '四', '五', '六'],
       details: [],
       currentDate: null,
@@ -47,15 +49,29 @@ export default {
   },
   computed: {
   },
+  mounted() {
+    this.installEvent();
+  },
+  beforeDestory() {
+    // 卸载事件
+    this.uninstallEvent();
+  },
   methods: {
     show() {
-      this.visable = true;
-
-      this.currentDate = this.selectedDate ? moment(this.selectedDate) : moment();
-      this.details = this.getDetails(this.currentDate);
+      this.visiable = true;
     },
     hide() {
-      this.visable = false;
+      this.visiable = false;
+    },
+
+    // 弹出
+    popup() {
+      if (!this.visiable) {
+        this.currentDate = this.selectedDate ? moment(this.selectedDate) : moment();
+        this.details = this.getDetails(this.currentDate);
+
+        this.show();
+      }
     },
 
     // 获取详情
@@ -102,6 +118,20 @@ export default {
     nextMonth() {
       this.currentDate.add(1, 'month');
       this.details = this.getDetails(this.currentDate);
+    },
+
+    // 安装事件
+    installEvent() {
+      this.unbindFn = addEvent(document, 'click', (e) => {
+        if (e.path.indexOf(this.$el) == -1) {
+          this.hide();
+        }
+      })
+    },
+
+    // 卸载事件
+    uninstallEvent() {
+      this.unbindFn();
     }
   }
 }
